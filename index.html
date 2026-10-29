@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>呼吸机报警设置</title>
+<style>
+  :root{
+    --blue:#1668dc; --blue-bg:#eef5ff; --blue-line:#cfe1fb;
+    --orange:#c2410c; --orange-bg:#fff7ed; --orange-line:#fed7aa;
+    --green:#15803d; --green-bg:#f0fdf4;
+    --red:#dc2626; --red-bg:#fef2f2;
+    --bg:#f2f5f9; --card:#fff; --line:#e3e8f0;
+    --t1:#111827; --t2:#4b5563; --t3:#8b95a5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{overflow-x:hidden}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--t1);font-size:15px;line-height:1.5;
+    padding-bottom:24px;-webkit-font-smoothing:antialiased;
+  }
+  /* ---------- 顶部 ---------- */
+  .top{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(135deg,#1668dc,#2f7cf0);
+    color:#fff;padding:12px 16px 11px;
+    box-shadow:0 2px 8px rgba(22,104,220,.22);
+  }
+  .top h1{font-size:16px;font-weight:600;letter-spacing:.3px}
+  .top .sub{font-size:11px;opacity:.85;margin-top:2px}
+  main{padding:10px 12px 0;max-width:520px;margin:0 auto}
+
+  /* ---------- 区块 ---------- */
+  .sec{margin-bottom:10px}
+  .sec-h{display:flex;align-items:center;gap:7px;padding:2px 2px 7px}
+  .sec-h .no{
+    font-size:10px;font-weight:700;color:#fff;background:var(--blue);
+    border-radius:4px;padding:2px 5px;letter-spacing:.5px;
+  }
+  .sec-h .tx{font-size:13px;font-weight:700;color:#1f2937;letter-spacing:.3px}
+  .sec-h .rt{margin-left:auto;font-size:11px;color:var(--t3)}
+  .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+
+  /* ---------- 表单 ---------- */
+  select,input{
+    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
+    font-size:15px;color:var(--t1);background:#fff;
+    font-family:inherit;appearance:none;-webkit-appearance:none;
+  }
+  select{background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b95a5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+  input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(22,104,220,.1)}
+  input::placeholder{color:#c3cad6}
+  label{display:block;font-size:11px;color:var(--t3);margin-bottom:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grid2 > div{min-width:0}
+  .row{display:flex;gap:8px;align-items:flex-end}
+  .req{margin-left:4px;font-size:9px;font-weight:700;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:3px;padding:0 3px;vertical-align:1px}
+  .opt{margin-left:5px;font-size:9.5px;color:#8b95a5;font-weight:400}
+
+  /* 性别分段 */
+  .seg{display:flex;background:#eef1f6;border-radius:8px;padding:3px;gap:3px;height:38px}
+  .seg button{
+    flex:1;border:none;background:transparent;border-radius:6px;
+    font-size:14px;font-family:inherit;color:var(--t2);cursor:pointer;transition:.15s;
+  }
+  .seg button.on{background:#fff;color:var(--blue);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+  /* ---------- 场景目标 ---------- */
+  .strat{
+    background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:9px;
+    padding:9px 11px;font-size:14px;font-weight:600;color:#12437f;line-height:1.55;
+  }
+  .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+      border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:9px}
+  .kv > div{background:#fff;padding:8px 9px}
+  .kv .k{font-size:10px;color:var(--t3);margin-bottom:2px;white-space:nowrap}
+  .kv .v{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:.2px}
+  .kv .v small{font-size:10px;font-weight:400;color:var(--t3);margin-left:1px}
+  .kv .v.dbl{font-size:13px;color:var(--blue)}
+  .ibw-val{
+    height:38px;display:flex;align-items:center;justify-content:center;gap:2px;
+    background:var(--blue-bg);border:1px solid var(--blue-line);border-radius:8px;
+    font-size:16px;font-weight:800;color:var(--blue);letter-spacing:.2px;
+  }
+  .ibw-val em{font-size:9.5px;font-weight:600;color:#5b8fd8;font-style:normal;letter-spacing:0}
+  .ibw-val.miss{background:#f8fafc;border-color:var(--line);color:#c3cad6;font-size:11px;font-weight:500;letter-spacing:0}
+  .ibw{margin-top:6px;font-size:10.5px;color:var(--t3)}
+  .ibw b{color:var(--blue);font-weight:700}
+  .ibw.miss{color:#dc2626}
+  .kv .v.need{font-size:11.5px;font-weight:600;color:#dc2626}
+  .tips{margin-top:9px;background:var(--orange-bg);border:1px solid var(--orange-line);border-radius:9px;padding:9px 11px}
+  .tips .th{font-size:11px;font-weight:700;color:var(--orange);margin-bottom:5px;letter-spacing:.5px}
+  .tip{display:flex;gap:6px;font-size:13px;color:#7c2d12;line-height:1.5;margin-bottom:3px}
+  .tip:last-child{margin-bottom:0}
+  .tip i{width:5px;height:5px;border-radius:50%;background:#e07b12;flex-shrink:0;margin-top:7px}
+
+  /* ---------- 报警项 ---------- */
+  .alarms{display:flex;flex-direction:column;gap:8px}
+  .a{
+    background:var(--card);border-radius:11px;padding:10px 12px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06);border-left:3px solid var(--blue);
+  }
+  .a.warn{border-left-color:var(--red);background:#fffafa}
+  .a .hd{display:flex;align-items:baseline;gap:8px}
+  .a .nm{font-size:13px;font-weight:700;color:#1f2937;flex:1;min-width:0}
+  .a .vl{font-size:19px;font-weight:800;color:var(--blue);letter-spacing:.3px;white-space:nowrap;display:flex;align-items:baseline;gap:2px}
+  .a .vl em{font-size:10.5px;font-weight:500;color:var(--t3);font-style:normal;letter-spacing:0}
+  .a.warn .vl{color:var(--red)}
+  .a .ru{font-size:10.5px;color:var(--t3);margin-top:1px}
+  .a .warnmsg{
+    margin-top:6px;background:var(--red-bg);color:#991b1b;border-radius:6px;
+    padding:6px 8px;font-size:12px;line-height:1.5;font-weight:500;
+  }
+  .a .io{margin-top:6px;padding-top:6px;border-top:1px dashed #e8ecf3}
+  .a .io p{font-size:12px;line-height:1.55;color:var(--t2);display:flex;gap:6px;align-items:flex-start}
+  .a .io p + p{margin-top:3px}
+  .a .io .lb{flex-shrink:0;font-weight:700;font-size:11px;letter-spacing:.2px;white-space:nowrap}
+  .a .io .lb.c1{color:var(--orange)}
+  .a .io .lb.c2{color:var(--green)}
+
+  .empty{
+    background:var(--card);border-radius:12px;padding:26px 16px;text-align:center;
+    color:var(--t3);font-size:13px;line-height:1.7;box-shadow:0 1px 3px rgba(15,23,42,.06)
+  }
+  .empty b{color:var(--blue);font-weight:600}
+  .foot{text-align:center;font-size:10.5px;color:#a3abba;padding:14px 8px 4px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>呼吸机报警设置</h1>
+  <div class="sub">选场景填身高 → 输入实际设定值 → 得出报警上下限</div>
+</div>
+
+<main>
+  <!-- 01 患者与场景 -->
+  <div class="sec">
+    <div class="sec-h"><span class="no">01</span><span class="tx">患者与场景</span><span class="rt">决定潮气量目标</span></div>
+    <div class="card">
+      <select id="scene" onchange="renderScene()"></select>
+      <div class="row" style="margin-top:8px">
+        <div style="flex:0 0 96px"><label>性别</label>
+          <div class="seg" id="sexSeg">
+            <button type="button" class="on" data-v="m" onclick="setSex('m')">男</button>
+            <button type="button" data-v="f" onclick="setSex('f')">女</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0"><label>身高 cm<span class="req">必填</span></label>
+          <input type="number" inputmode="numeric" id="hgt" placeholder="如 170" oninput="onHgt()">
+        </div>
+        <div style="flex:0 0 84px"><label>IBW 理想体重</label>
+          <div class="ibw-val" id="ibwVal">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 目标 -->
+  <div class="sec">
+    <div class="sec-h"><span class="no">02</span><span class="tx">该场景设置目标</span><span class="rt">按此设定呼吸机</span></div>
+    <div class="card" id="targetCard"></div>
+  </div>
+
+  <!-- 03 输入 -->
+  <div class="sec">
+    <div class="sec-h"><span class="no">03</span><span class="tx">实际设定值</span><span class="rt">填入呼吸机当前值</span></div>
+    <div class="card">
+      <div class="grid2" style="margin-bottom:8px">
+        <div><label>潮气量 VT　mL</label><input type="number" inputmode="numeric" id="vt" placeholder="先填身高" oninput="calc()"></div>
+        <div><label>频率 f　次/分</label><input type="number" inputmode="numeric" id="rr" placeholder="如 16" oninput="calc()"></div>
+      </div>
+      <div class="grid2" style="margin-bottom:8px">
+        <div><label>PEEP　cmH₂O</label><input type="number" inputmode="numeric" id="peep" placeholder="如 8" oninput="calc()"></div>
+        <div><label>峰压 Ppeak　cmH₂O</label><input type="number" inputmode="numeric" id="ppeak" placeholder="如 25" oninput="calc()"></div>
+      </div>
+      <div class="grid2" style="margin-bottom:8px">
+        <div><label>FiO₂　%</label><input type="number" inputmode="numeric" id="fio2" placeholder="如 40" oninput="calc()"></div>
+        <div><label>通气模式</label>
+          <select id="mode" onchange="calc()">
+            <option value="ctrl">控制通气</option>
+            <option value="spont">自主通气</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:8px"><label>分钟通气量 MV　L/min<span class="opt">选填 · 抄呼吸机显示值更准</span></label>
+        <input type="number" inputmode="decimal" id="mvs" placeholder="不填则按 VT×f 估算" oninput="calc()"></div>
+      <div><label>平均气道压 Paw　cmH₂O<span class="opt">选填 · 决定压力下限</span></label>
+        <input type="number" inputmode="decimal" id="paw" placeholder="不填则按 PEEP−2 估算" oninput="calc()"></div>
+    </div>
+  </div>
+
+  <!-- 04 结果 -->
+  <div class="sec">
+    <div class="sec-h"><span class="no">04</span><span class="tx">报警上下限</span><span class="rt">设到呼吸机上</span></div>
+    <div id="alarmBox">
+      <div class="empty">先在 <b>01</b> 填好身高<br>再输入潮气量、频率、PEEP、峰压、FiO₂</div>
+    </div>
+  </div>
+
+  <p class="foot">依据院内呼吸机报警设置规范整理　·　设置请以医嘱为准</p>
+</main>
+
+<script>
+/* ================= 疾病场景（源自 Excel「设置」表） ================= */
+const SCENES = [
+ {n:"通用（默认）", s:"常规保护性通气，适用于无特殊病理状态的成人患者",
+  vt:[6,8], peep:[5,10], peepNote:"", f:[12,20], pplat:"≤30",
+  spo2:"94–98", etco2:"35–45",
+  tips:["按病情动态调整参数","SpO₂ 下限不低于 94%","关注人机同步与呼吸做功"]},
+
+ {n:"ARDS", s:"肺保护性通气，限制肺应力",
+  vt:[4,6], peep:[5,20], peepNote:"按 FiO₂-PEEP 阶梯", f:[16,24], pplat:"≤30",
+  spo2:"88–92", etco2:"35–45",
+  tips:["平台压上限严格","血氧下限不要设 95%","警惕气压伤"]},
+
+ {n:"AECOPD / Ⅱ型呼衰", s:"允许性高碳酸血症，降低动态过度充气",
+  vt:[7,9], peep:[5,8], peepNote:"抵消内源性 PEEP", f:[10,15], pplat:"≤30",
+  spo2:"90–94", etco2:"45–65",
+  tips:["分钟通气量上限放宽","呼气时间尽量延长","监测 auto-PEEP"]},
+
+ {n:"危重型哮喘", s:"低通气、长呼气，避免肺过度充气",
+  vt:[4,6], peep:[5,10], peepNote:"", f:[8,10], pplat:"≤30",
+  spo2:"90–94", etco2:"40–60",
+  tips:["峰压常偏高，不要盲目加通气","压力报警重点关注骤升"]},
+
+ {n:"颅脑损伤 / 脑出血 · 颅高压期", s:"适度控制性低碳酸降颅压",
+  vt:[6,8], peep:[5,8], peepNote:"", f:[16,22], pplat:"≤30",
+  spo2:"94–98", etco2:"30–35",
+  tips:["EtCO₂ 波动不能大","通气量报警范围收窄","不可长期过度通气"]},
+
+ {n:"颅脑损伤 / 脑出血 · 恢复期", s:"维持 CO₂ 正常平稳",
+  vt:[6,8], peep:[5,8], peepNote:"", f:[14,20], pplat:"≤30",
+  spo2:"94–98", etco2:"35–45",
+  tips:["避免通气忽高忽低","防止脑灌注波动"]},
+
+ {n:"心跳骤停后 HIE", s:"避免高氧、避免低碳酸",
+  vt:[6,8], peep:[5,10], peepNote:"", f:[14,20], pplat:"≤30",
+  spo2:"92–96", etco2:"35–45",
+  tips:["严禁血氧长期 100%","严防过度通气"]},
+
+ {n:"急性左心衰 / 肺水肿", s:"PEEP 减轻肺水肿，兼顾循环耐受",
+  vt:[6,8], peep:[8,15], peepNote:"", f:[16,22], pplat:"≤30",
+  spo2:"92–96", etco2:"35–45",
+  tips:["PEEP 会抑制血压","平均气道压不宜过高","联动血压评估"]},
+
+ {n:"VA-ECMO 联合呼吸机", s:"超保护性通气，让肺休息",
+  vt:[3,4], peep:[10,15], peepNote:"", f:[8,12], pplat:"≤25",
+  spo2:"88–95", etco2:"35–45",
+  tips:["压力上限压得很低","通气目标保守","与常规 ARDS 完全不同"]},
+
+ {n:"重症肺炎（无 ARDS）", s:"常规保护性通气",
+  vt:[6,8], peep:[5,10], peepNote:"", f:[14,20], pplat:"≤30",
+  spo2:"92–96", etco2:"35–45",
+  tips:["按氧合情况上调 PEEP","动态评估是否进展为 ARDS"]},
+
+ {n:"多发胸创伤 / 连枷胸", s:"镇痛优先，警惕气胸风险",
+  vt:[6,8], peep:[5,10], peepNote:"", f:[14,20], pplat:"≤30",
+  spo2:"92–96", etco2:"35–45",
+  tips:["气道压力报警灵敏度调高","压力突然升高优先排查气胸"]},
+
+ {n:"吉兰-巴雷 / 神经肌肉疾病", s:"肺顺应性正常，需补足通气",
+  vt:[6,8], peep:[5,8], peepNote:"", f:[14,20], pplat:"≤30",
+  spo2:"92–96", etco2:"35–45",
+  tips:["重点防通气不足","MV 下限不能太高"]}
+];
+
+/* ========= 报警规则：依据 = 院内报警设置规范图片规则表 + Excel「设置」表（不再采用 Sheet1） ========= */
+const R = {
+  ppeak:{nm:"气道压高压上限",
+    cause:"痰堵、管路打折、呛咳、人机对抗、气胸",
+    act:"吸痰、检查管路，必要时通知医生"},
+  plow:{nm:"气道压力下限",
+    cause:"管路脱开、漏气、气囊漏气",
+    act:"检查管路连接与气囊，排查漏气点"},
+  vt:{nm:"潮气量 VT 上/下限",
+    cause:"上限超：人机对抗；下限低：漏气、管路脱开",
+    act:"检查管路，评估镇静与顺应性"},
+  mv:{nm:"分钟通气量 MV 上/下限",
+    cause:"上限超：过度通气、躁动；下限低：漏气、呼吸抑制",
+    act:"查血气、排查漏气、评估镇静"},
+  rr:{nm:"呼吸频率 上/下限",
+    cause:"躁动、发热、酸中毒、呼吸抑制",
+    act:"评估原因，通知医生调整"},
+  fio2:{nm:"吸入氧浓度 FiO₂ 上/下限",
+    cause:"氧源问题、设置被改动",
+    act:"检查氧源与设置"},
+  apnea:{nm:"窒息报警",
+    cause:"自主呼吸停止、触发失败、后备通气未开启",
+    act:"立即床旁评估，改后备/手控通气，呼叫医生"},
+  trig:{nm:"触发灵敏度",
+    cause:"过敏感：误触发；过迟钝：触发费力",
+    act:"结合人机同步性遵医嘱调整"}
+};
+
+const $ = id => document.getElementById(id);
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+const r1=x=>Math.round(x*10)/10;
+let sex="m", cur=SCENES[0];
+
+SCENES.forEach((s,i)=>{const o=document.createElement("option");o.value=i;o.textContent=s.n;$("scene").appendChild(o);});
+
+function updateIbw(){
+  const b = ibw(), el = $("ibwVal");
+  if(b){ el.classList.remove("miss"); el.innerHTML = `${b.toFixed(1)}<em>kg</em>`; }
+  else { el.classList.add("miss"); el.textContent = "待填身高"; }
+}
+function setSex(v){
+  sex=v;
+  document.querySelectorAll("#sexSeg button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  updateIbw();
+  if($("hgt").value) renderScene(); calc();
+}
+function onHgt(){ updateIbw(); renderScene(); calc(); }
+
+/* IBW：男 50+0.91×(H−152.4)，女 45.5+0.91×(H−152.4) */
+function ibw(){
+  const h=parseFloat($("hgt").value);
+  if(!h||h<120||h>220) return null;
+  return sex==="m" ? 50+0.91*(h-152.4) : 45.5+0.91*(h-152.4);
+}
+
+/* ================= 02 目标 ================= */
+function renderScene(){
+  cur = SCENES[+$("scene").value];
+  const b = ibw();
+  const vtLo = b ? Math.round(cur.vt[0]*b) : null;
+  const vtHi = b ? Math.round(cur.vt[1]*b) : null;
+
+  $("targetCard").innerHTML = `
+    <div class="strat">${cur.s}</div>
+    <div class="kv">
+      <div><div class="k">潮气量 VT</div>
+        <div class="v">${cur.vt[0]}–${cur.vt[1]}<small>ml/kg</small></div>
+        ${b?`<div class="v dbl">${vtLo}–${vtHi}<small>mL</small></div>`
+            :`<div class="v dbl need">填身高后换算</div>`}</div>
+      <div><div class="k">PEEP</div><div class="v">${cur.peep[0]}–${cur.peep[1]}<small>cmH₂O</small></div>
+        ${cur.peepNote?`<div class="k" style="margin-top:2px;font-size:9.5px">${cur.peepNote}</div>`:""}</div>
+      <div><div class="k">呼吸频率 f</div><div class="v">${cur.f[0]}–${cur.f[1]}<small>次/分</small></div></div>
+      <div><div class="k">平台压 Pplat</div><div class="v">${cur.pplat}<small>cmH₂O</small></div></div>
+      <div><div class="k">SpO₂ 目标</div><div class="v">${cur.spo2}<small>%</small></div></div>
+      <div><div class="k">EtCO₂ 目标</div><div class="v">${cur.etco2}<small>mmHg</small></div></div>
+    </div>
+    ${b?"":`<div class="ibw miss">未填身高：只给 ml/kg，不出 mL 绝对值</div>`}
+    <div class="tips">
+      <div class="th">报警设置重点</div>
+      ${cur.tips.map(t=>`<div class="tip"><i></i><span>${t}</span></div>`).join("")}
+    </div>`;
+  updatePh();
+}
+
+/* [2026-10-29 15:30] 占位示例值随场景/身高实时更新，取当前目标区间内的值，避免示例与目标区间不符 */
+function updatePh(){
+  const c=SCENES[+$("scene").value]||SCENES[0], b=ibw(), mid=(a,z)=>Math.round((a+z)/2);
+  $("vt").placeholder = b ? `如 ${mid(Math.round(c.vt[0]*b),Math.round(c.vt[1]*b))}` : "先填身高";
+  $("rr").placeholder = `如 ${mid(c.f[0],c.f[1])}`;
+  $("peep").placeholder = `如 ${mid(c.peep[0],c.peep[1])}`;
+  $("ppeak").placeholder = `如 ${Math.max(c.pplatValue-5,15)}`;
+  $("fio2").placeholder = "如 40";
+}
+
+function num(id){const v=parseFloat($(id).value);return isNaN(v)?null:v;}
+
+/* ================= 04 报警限 ================= */
+function calc(){
+  const vtSet=num("vt"), rrSet=num("rr"), peepSet=num("peep"), ppeakSet=num("ppeak"), fio2Set=num("fio2");
+  if([vtSet,rrSet,peepSet,ppeakSet,fio2Set].every(v=>v===null)){
+    $("alarmBox").innerHTML='<div class="empty">先在 <b>01</b> 填好身高<br>再输入潮气量、频率、PEEP、峰压、FiO₂</div>';
+    return;
+  }
+
+  const bw = ibw();
+  const tLo = bw ? Math.round(cur.vt[0]*bw) : null;
+  const tHi = bw ? Math.round(cur.vt[1]*bw) : null;
+
+  /* 双基准取严：设定值先夹到场景目标区间；无身高则不夹（无法核对目标） */
+  const vtE  = vtSet===null ? tHi : (tLo===null ? vtSet : clamp(vtSet,tLo,tHi));
+  const rrE  = rrSet===null   ? cur.f[1]     : clamp(rrSet, cur.f[0], cur.f[1]);
+  const peepE= peepSet===null ? cur.peep[0]  : clamp(peepSet, cur.peep[0], cur.peep[1]);
+
+  const out=[];
+
+  /* 1 高压上限 */
+  if(ppeakSet!==null){
+    const hi=Math.min(ppeakSet+10,40), rec=Math.min(ppeakSet+5,40);
+    let w="";
+    if(ppeakSet>cur.pplatValue+10) w=`峰压 ${ppeakSet} 已超平台压目标（${cur.pplat}）10 以上，先排查痰堵 / 管路 / 人机对抗 / 气胸，再定报警限`;
+    else if(ppeakSet>cur.pplatValue+5) w=`峰压与平台压差 >5，提示气道阻力升高，注意压力骤升报警`;
+    else if(ppeakSet+5>40) w=`峰压 ${ppeakSet} 已接近 40，报警上限只能取 40，必须先降低峰压`;
+    const ruPk = rec>=40 ? `峰压 ${ppeakSet} + 5 ≈ 40，已达最高 40`
+                         : `峰压 ${ppeakSet} + 5 ≈ ${rec}（可放宽至 ${hi}，最高不超过 40）`;
+    out.push({k:"ppeak", v:`≤ ${rec}`, u:"cmH₂O", ru:ruPk, warn:w});
+  }
+
+  /* 2 压力下限：图片口径 = 平均气道压 − 5～10；须严格低于实际 PEEP，否则持续报警 */
+  if(peepSet!==null){
+    const pawSet=num("paw"), cap=Math.max(peepSet-1,0);
+    let rec, wide, ru, w="";
+    if(pawSet!==null){
+      const a5=Math.max(Math.round(pawSet-5),0), a10=Math.max(Math.round(pawSet-10),0);
+      wide=Math.min(a10,cap);
+      if(a5>=cap){ rec=cap; ru=`平均气道压 ${pawSet} − 5 ≈ ${a5}，但须低于 PEEP ${peepSet} → 取 ${rec}`; }
+      else { rec=a5; ru=`平均气道压 ${pawSet} − 5 ≈ ${a5}（可放宽 − 10 即 ${wide}），已在 PEEP ${peepSet} 之下`; }
+    }else{
+      rec=Math.max(peepSet-2,0); wide=Math.max(peepSet-5,0);
+      ru=`未填 Paw：按实际 PEEP ${peepSet} − 2 估算（图片口径为平均气道压 − 5～10）；最宽 PEEP − 5 = ${wide}`;
+    }
+    if(peepSet>cur.peep[1]||peepSet<cur.peep[0]) w=`PEEP ${peepSet} 超出本场景目标 ${cur.peep[0]}–${cur.peep[1]}，报警下限已按实际 PEEP 计算`;
+    out.push({k:"plow", v:`≥ ${rec}`, u:"cmH₂O", ru, warn:w});
+  }
+
+  /* 3 VT */
+  if(vtSet!==null && vtE!==null){
+    const lo=Math.round(vtE*0.75), hi=Math.round(vtE*1.25);
+    let w="";
+    if(tLo===null) w=`未填身高，无法核对目标区间，报警限按实际设定值 ${vtSet} mL 计算`;
+    else if(vtSet>tHi) w=`已设 ${vtSet} mL，超过本场景目标上限 ${tHi} mL，报警限按 ${vtE} mL 计算 —— 请先下调潮气量`;
+    else if(vtSet<tLo) w=`已设 ${vtSet} mL，低于本场景目标下限 ${tLo} mL，存在通气不足风险`;
+    const base = tLo===null ? `实际设定 ${vtE} mL` : `设定 ${vtE} mL（目标 ${tLo}–${tHi}）`;
+    out.push({k:"vt", v:`${lo} ~ ${hi}`, u:"mL", ru:`基准 ${base} ± 25%`, warn:w});
+  }
+
+  /* 4 MV（优先用呼吸机实测值） */
+  const mvSet = num("mvs");
+  if(mvSet!==null || (vtSet!==null && rrSet!==null && vtE!==null)){
+    const mvCal = vtE!==null && rrSet!==null ? vtE*rrE/1000 : null;
+    const mvE   = mvSet!==null ? mvSet : mvCal;
+    const lo=r1(mvE*0.75), hi=r1(mvE*1.25), wLo=r1(mvE*0.70), wHi=r1(mvE*1.30);
+    let w="";
+    if(mvE<4||mvE>10) w=`MV ${r1(mvE)} L/min 超出成人常规 4～10 L/min`;
+    if(mvSet!==null && mvCal!==null && Math.abs(mvSet-mvCal)/mvCal>0.25)
+      w=`实测 MV ${r1(mvSet)} L/min 与 VT×f 估算 ${r1(mvCal)} 偏差 >25%，请核对潮气量与频率设置`;
+    const src = mvSet!==null ? `实测 MV ${r1(mvE)} L/min` : `VT×f 估算 ${r1(mvE)} L/min`;
+    out.push({k:"mv", v:`${lo} ~ ${hi}`, u:"L/min",
+      ru:`${src} ± 25%（可放宽至 ± 30% 即 ${wLo}～${wHi}）`, warn:w, est:mvSet===null});
+  }
+
+  /* 5 RR */
+  if(rrSet!==null){
+    const up=Math.min(rrE+5,35), dn=Math.max(rrE-5,5), wUp=Math.min(rrE+10,35);
+    let w="";
+    if(rrSet>cur.f[1]||rrSet<cur.f[0]) w=`设定 ${rrSet} 次/分超出本场景目标 ${cur.f[0]}–${cur.f[1]}，报警限按 ${rrE} 计算`;
+    const ruRR = up>=35 ? `频率 ${rrE}：上限 ≈ 35（已达最高 35）；下限 f−5（不低于 5）`
+                        : `频率 ${rrE}：上限 f+5（可放宽至 f+10 即 ${wUp}，最高不超过 35）；下限 f−5（不低于 5）`;
+    out.push({k:"rr", v:`${dn} ~ ${up}`, u:"次/分", ru:ruRR, warn:w});
+  }
+
+  /* 6 FiO2 */
+  if(fio2Set!==null){
+    const lo=Math.max(Math.round(fio2Set*0.95),21), hi=Math.min(Math.round(fio2Set*1.05),100);
+    const wLo=Math.max(Math.round(fio2Set*0.9),21), wHi=Math.min(Math.round(fio2Set*1.1),100);
+    let w="";
+    if(/HIE/.test(cur.n) && fio2Set>=80) w="本场景严禁血氧长期 100%，建议尽快下调 FiO₂";
+    else if(/ARDS|ECMO|哮喘|AECOPD/.test(cur.n) && fio2Set>=90) w="本场景应避免长期高浓度氧，注意吸收性肺不张";
+    out.push({k:"fio2", v:`${lo} ~ ${hi}`, u:"%", ru:`FiO₂ ${fio2Set}% ± 5%（可放宽至 ± 10% 即 ${wLo}～${wHi}%）`, warn:w});
+  }
+
+  /* 7 窒息 */
+  if($("mode").value==="spont"){
+    out.push({k:"apnea", v:"10 ~ 20", u:"s", ru:"自主通气：无有效触发即报警并启后备通气；高风险取 10～15 s", warn:""});
+  }else{
+    out.push({k:"apnea", v:"10 ~ 20", u:"s", ru:"控制通气：常规 20 s；启用后备通气时按此设定", warn:""});
+  }
+
+  /* 8 触发灵敏度 */
+  out.push({k:"trig", v:"1 ~ 3", u:"L/min 流量", ru:"或压力触发 −1 ~ −2 cmH₂O", warn:""});
+
+  $("alarmBox").innerHTML = `<div class="alarms">` + out.map(o=>{
+    const r=R[o.k];
+    return `<div class="a${o.warn?" warn":""}">
+      <div class="hd"><span class="nm">${r.nm}</span><span class="vl">${o.v}${o.u?`<em>${o.u}</em>`:""}</span></div>
+      <div class="ru">${o.ru}</div>
+      ${o.warn?`<div class="warnmsg">${o.warn}</div>`:""}
+      <div class="io">
+        <p><span class="lb c1">常见原因</span><span>${r.cause}</span></p>
+        <p><span class="lb c2">初步处理</span><span>${r.act}</span></p>
+      </div>
+    </div>`;
+  }).join("") + `</div>`;
+}
+
+/* pplat 数值化 */
+SCENES.forEach(s=>s.pplatValue = parseInt(s.pplat.replace(/[^0-9]/g,""),10) || 30);
+
+updateIbw();
+renderScene();
+</script>
+</body>
+</html>
